@@ -7,7 +7,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         {/* Logo */}
         <div className="flex flex-col items-center gap-2 mb-8">
           <Image
-            src="/logo.png"
+            src="/Logo.png"
             alt="Ervas Finas"
             width={80}
             height={80}
