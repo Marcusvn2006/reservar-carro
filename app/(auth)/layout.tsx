@@ -1,4 +1,4 @@
-import { Car } from "lucide-react";
+import Image from "next/image";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -6,9 +6,14 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="flex flex-col items-center gap-2 mb-8">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-700 text-white shadow">
-            <Car className="h-7 w-7" />
-          </div>
+          <Image
+            src="/logo.png"
+            alt="Ervas Finas"
+            width={80}
+            height={80}
+            className="object-contain"
+            priority
+          />
           <h1 className="text-xl font-bold text-gray-900 tracking-tight">
             ReservarCarro
           </h1>
