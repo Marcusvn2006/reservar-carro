@@ -15,9 +15,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             priority
           />
           <h1 className="text-xl font-bold text-gray-900 tracking-tight">
-            ReservarCarro
+            Ervas Finas
           </h1>
-          <p className="text-sm text-gray-500">Sistema de controle de frota</p>
+          <p className="text-sm text-gray-500">Controle de frota</p>
         </div>
 
         {children}
