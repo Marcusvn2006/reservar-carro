@@ -34,17 +34,20 @@ export async function proxy(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Navegações de tela usam a sessão local apenas para decidir redirects de
+  // UX. A validação autoritativa continua nas páginas via getUsuarioAtual().
+  // APIs mantêm getUser() para não reduzir a proteção das rotas existentes.
+  const autenticado = pathname.startsWith("/api/")
+    ? Boolean((await supabase.auth.getUser()).data.user)
+    : Boolean((await supabase.auth.getSession()).data.session);
 
   const isPublic = PUBLIC_PATHS.some((p) => pathname.startsWith(p));
 
-  if (!user && !isPublic) {
+  if (!autenticado && !isPublic) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  if (user && isPublic) {
+  if (autenticado && isPublic) {
     return NextResponse.redirect(new URL("/home", request.url));
   }
 

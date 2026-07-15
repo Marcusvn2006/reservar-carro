@@ -14,6 +14,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { LogoutButton } from "@/components/LogoutButton";
 import { formatBRT } from "@/lib/utils";
+import { getUsuarioAtual } from "@/lib/auth/getUsuarioAtual";
 import type { StatusReserva } from "@/lib/types/database.types";
 
 type ReservaProxima = {
@@ -27,22 +28,16 @@ type ReservaProxima = {
 };
 
 export default async function HomePage() {
-  const supabase = await createClient();
+  const usuarioAtual = await getUsuarioAtual();
+  if (!usuarioAtual) redirect("/login");
+  const { user, perfil } = usuarioAtual;
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const supabase = await createClient();
 
   const agora = new Date();
   const limite48h = new Date(agora.getTime() - 48 * 60 * 60 * 1000).toISOString();
 
-  const [
-    { data: perfil },
-    { data: veiculos },
-    { data: minhasReservasRaw },
-  ] = await Promise.all([
-    supabase.from("usuarios").select("*").eq("id", user.id).single(),
+  const [{ data: veiculos }, { data: minhasReservasRaw }] = await Promise.all([
     supabase.from("veiculos").select("*"),
     supabase
       .from("reservas")
@@ -58,12 +53,12 @@ export default async function HomePage() {
       .limit(5),
   ]);
 
-  const isGestor = perfil?.papel === "gestor";
+  const isGestor = perfil.papel === "gestor";
   const emManutencao = veiculos?.filter((v) => v.em_manutencao).length ?? 0;
   const comAtencao =
     veiculos?.filter((v) => v.precisa_atencao && !v.em_manutencao).length ?? 0;
   const disponiveis = (veiculos?.length ?? 0) - emManutencao;
-  const firstName = perfil?.nome?.split(" ")[0] ?? "Usuário";
+  const firstName = perfil.nome?.split(" ")[0] ?? "Usuário";
 
   const minhasReservas = (minhasReservasRaw ?? []) as unknown as ReservaProxima[];
 

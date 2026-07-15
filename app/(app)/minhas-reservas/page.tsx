@@ -5,6 +5,7 @@ import { Plus, Clock, Car, Calendar, XCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatBRT } from "@/lib/utils";
+import { getUsuarioAtual } from "@/lib/auth/getUsuarioAtual";
 import type { StatusReserva } from "@/lib/types/database.types";
 
 type MinhaReserva = {
@@ -33,21 +34,14 @@ const STATUS_BADGE: Record<
 };
 
 export default async function MinhasReservasPage() {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-
-  const { data: perfil } = await supabase
-    .from("usuarios")
-    .select("papel")
-    .eq("id", user.id)
-    .single();
+  const usuarioAtual = await getUsuarioAtual();
+  if (!usuarioAtual) redirect("/login");
+  const { user, perfil } = usuarioAtual;
 
   // Gestor acessa o painel completo
-  if (perfil?.papel === "gestor") redirect("/reservas");
+  if (perfil.papel === "gestor") redirect("/reservas");
+
+  const supabase = await createClient();
 
   // UUID não tem espaços — .or() funciona corretamente com UUIDs
   const { data: reservasRaw } = await supabase
